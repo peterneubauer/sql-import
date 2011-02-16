@@ -1,0 +1,2 @@
+startId,endId,relType,since,licence
+10,1,OWNS,2000,ABC-123
