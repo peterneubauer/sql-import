@@ -3,8 +3,8 @@ package com.neo4j.sqlimport;
 import java.util.Map;
 
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.index.lucene.LuceneIndexBatchInserter;
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
 import org.neo4j.kernel.impl.batchinsert.SimpleRelationship;
 
@@ -21,7 +21,6 @@ public class M2MInstruction extends LinkInstruction {
 			String fromNodeIdIndexName, Field toIdField,
 			String toNodeIdIndexName, RelationshipType relationshipType) {
 		this.fromAggregationName = fromAggregationName;
-		// TODO Auto-generated constructor stub
 		this.fromNodeIdField = fromIdField;
 		this.fromNodeIndexName = fromNodeIdIndexName;
 		this.toNodeIdField = toIdField;
@@ -31,7 +30,7 @@ public class M2MInstruction extends LinkInstruction {
 
 	@Override
 	public void execute(BatchInserterImpl neo,
-			LuceneIndexBatchInserterImpl indexService) {
+	        BatchInserterIndexProvider indexService) {
 		long start = System.currentTimeMillis();
 		long aggregationNodeId = SQLImporter.getSubRefNode(fromAggregationName,
 				neo);
@@ -54,10 +53,12 @@ public class M2MInstruction extends LinkInstruction {
 					long toNodeId = getNodeIdFromIndex(toNodeIdField,
 							toNodeIndexName, indexService, linkNodeId,
 							linkNodeProperties);
+					linkNodeProperties.remove( fromNodeIdField.name );
+                    linkNodeProperties.remove( toNodeIdField.name );
 					// link
 					if (fromNodeId > 0 && toNodeId > 0) {
 						neo.createRelationship(fromNodeId, toNodeId,
-								relationshipType, null);
+								relationshipType, linkNodeProperties);
 						linkCount++;
 					}
 
@@ -73,14 +74,14 @@ public class M2MInstruction extends LinkInstruction {
 	}
 
 	private long getNodeIdFromIndex(Field fromNodeIdField,
-			String fromNodeIndexName, LuceneIndexBatchInserter indexService,
+			String fromNodeIndexName, BatchInserterIndexProvider indexService,
 			long linkNodeId, Map<String, Object> fromNodeProperties) {
 		long fromNodeId = -1;
 		if (fromNodeProperties.containsKey(fromNodeIdField.name)) {
 			Object fromNodeIdProp = fromNodeProperties
 					.get(fromNodeIdField.name);
-			fromNodeId = indexService.getSingleNode(fromNodeIndexName,
-					fromNodeIdProp);
+			fromNodeId = indexService.nodeIndex( fromNodeIndexName, MapUtil.stringMap( "type", "exact" ) ).get(
+			        fromNodeIndexName, fromNodeIdProp).getSingle();
 			if (fromNodeId > 0) {
 			} else {
 				System.out.println("could not find source node for value "

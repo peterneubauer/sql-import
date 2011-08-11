@@ -1,37 +1,26 @@
 package org.neo4j.sqlimport.file;
 //package org.neo4j.sqlimport.file;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
-import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
-import org.neo4j.kernel.impl.batchinsert.SimpleRelationship;
 import org.neo4j.graphdb.DynamicRelationshipType;
-
-import com.neo4j.sqlimport.Command;
-import org.neo4j.sqlimport.file.FileImportCommand;
-import org.neo4j.sqlimport.file.ReadRelationshipsFromFileCommand;
-import org.neo4j.sqlimport.file.ReadNodesFromFileCommand;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
+import org.neo4j.index.impl.lucene.LuceneBatchInserterIndexProvider;
+import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
 
 public class FileImport
 {
 
     private static final String TARGET_DIR = "target/neo4j";
     private BatchInserterImpl neo4j;
-    private LuceneIndexBatchInserterImpl index;
+    private BatchInserterIndexProvider index;
     private File nodeFile;
     private File relFile;
     protected String[] fields;
@@ -63,7 +52,7 @@ public class FileImport
     public void setUp() throws Exception
     {
         neo4j = new BatchInserterImpl( TARGET_DIR );
-        index = new LuceneIndexBatchInserterImpl( neo4j );
+        index = new LuceneBatchInserterIndexProvider( neo4j );
         stepSize = 10000;
     }
 

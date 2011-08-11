@@ -1,86 +1,47 @@
 package com.neo4j.sqlimport;
 
-import java.util.Map;
+import java.util.HashMap;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
-import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
-import org.neo4j.kernel.impl.batchinsert.SimpleRelationship;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
+import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.kernel.impl.batchinsert.BatchInserter;
 
+public class ForeignKeyInstruction extends ImportInstruction
+{
 
-public class ForeignKeyInstruction extends LinkInstruction {
+    private final Field fromIdField;
+    private final String toIndexName;
+    private final RelationshipType relationshipType;
+    private final String fromIndexName;
+    private final Field toIdField;
 
-	private final String aggregationName;
-	private final Field fromIdField;
-	private final String toIdIndexName;
-	private final RelationshipType relationshipType;
+    public ForeignKeyInstruction( Field[] names, String tableName,
+            Field fromIdField, String fromIndexName, Field toIdField,
+            String toIdIndexName, RelationshipType relationshipType )
+    {
+        super( names, "INSERT INTO \"" + tableName + "\" VALUES" );
+        this.fromIndexName = fromIndexName;
+        this.toIdField = toIdField;
+        this.fromIdField = fromIdField;
+        this.toIndexName = toIdIndexName;
+        this.relationshipType = relationshipType;
+    }
 
-	public ForeignKeyInstruction(String aggregationName, Field fromIdField,
-			String toIdIndexName, RelationshipType relationshipType) {
-		this.aggregationName = aggregationName;
-		this.fromIdField = fromIdField;
-		this.toIdIndexName = toIdIndexName;
-		this.relationshipType = relationshipType;
-	}
-
-	public ForeignKeyInstruction(String aggregationName, Field fromIdField,
-			String toIdIndexName) {
-		this(aggregationName, fromIdField, toIdIndexName,
-				DynamicRelationshipType.withName("refers_to_" + toIdIndexName));
-	}
-
-	public void execute(BatchInserterImpl neo,
-			LuceneIndexBatchInserterImpl indexService) {
-		long start = System.currentTimeMillis();
-
-		long aggregationNodeId = SQLImporter
-				.getSubRefNode(aggregationName, neo);
-
-		int linkCount = 0;
-		if (aggregationNodeId < 0) {
-			System.out.println("could not find aggregation node for "
-					+ aggregationName);
-		} else {
-			for (SimpleRelationship rel : neo
-					.getRelationships(aggregationNodeId)) {
-				// don't traverse subref rel
-				if (rel.getType().name().equals(Relationships.IS_A.name())) {
-					long fromNodeId = rel.getStartNode();
-					if(fromNodeId == aggregationNodeId) {
-						fromNodeId = rel.getEndNode();
-					}
-					Map<String, Object> fromNodeProperties = neo
-							.getNodeProperties(fromNodeId);
-					if (fromNodeProperties.containsKey(fromIdField.name)) {
-						Object toNodeIdProp = fromNodeProperties
-								.get(fromIdField.name);
-						long toNodeId = indexService.getSingleNode(
-								toIdIndexName, toNodeIdProp);
-						if (toNodeId > 0) {
-							neo.createRelationship(fromNodeId, toNodeId,
-									relationshipType, null);
-							linkCount++;
-						} else {
-							System.out
-									.println("could not find target node for value "
-											+ toNodeIdProp
-											+ " in index "
-											+ toIdIndexName);
-						}
-					} else {
-						System.out.println("could not find prorperty "
-								+ fromIdField.name + " on node " + fromNodeId);
-					}
-				}
-			}
-		}
-		System.out.println("created " + linkCount + " relationships between "
-				+ aggregationName + ":" + fromIdField.name + "--"
-				+ relationshipType.name() + "->" + toIdIndexName
-				+ " index prop in " + (System.currentTimeMillis() - start)
-				+ "ms");
-
-	}
+    @Override
+    void createData( BatchInserter neo,
+            BatchInserterIndexProvider indexProvider,
+            HashMap<String, Object> values )
+    {
+        long fromNodeId = indexProvider.nodeIndex( fromIndexName,
+                MapUtil.stringMap( "type", "exact" ) ).get( fromIndexName,
+                values.get( fromIdField.name ) ).getSingle();
+        long toNodeId = indexProvider.nodeIndex( toIndexName,
+                MapUtil.stringMap( "type", "exact" ) ).get( toIndexName,
+                values.get( toIdField.name ) ).getSingle();
+        values.remove( fromIdField.name );
+        values.remove( toIdField.name );
+        neo.createRelationship( fromNodeId, toNodeId, relationshipType, values );
+    }
 
 }

@@ -8,6 +8,7 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -25,9 +26,11 @@ public class AutoInsertTest {
 	public void setUp() {
 		importer = new SQLImporter(DB_DIR);
 		importer.deleteDB();
+		
 	}
 
 	@Test
+	@Ignore
 	public void importAll() {
 		//import the data
 		importer.autoImport(SQL_FILE);

@@ -3,7 +3,7 @@ package com.neo4j.sqlimport;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
 import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
 
 public class AutoImportInstruction implements  Command {
@@ -15,7 +15,7 @@ public class AutoImportInstruction implements  Command {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void execute(BatchInserterImpl neo, LuceneIndexBatchInserterImpl indexService) {
+	public void execute(BatchInserterImpl neo, BatchInserterIndexProvider indexService) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			// replace ,NULL, with ,'',

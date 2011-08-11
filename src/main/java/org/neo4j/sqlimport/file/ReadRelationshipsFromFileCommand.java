@@ -1,12 +1,10 @@
 package org.neo4j.sqlimport.file;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
 import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
 
 public class ReadRelationshipsFromFileCommand extends ReadNodesFromFileCommand
@@ -23,7 +21,7 @@ public class ReadRelationshipsFromFileCommand extends ReadNodesFromFileCommand
 
 
     protected void processRecord( BatchInserterImpl neo4j,
-            LuceneIndexBatchInserterImpl index, Map<String, Object> properties,
+            BatchInserterIndexProvider index, Map<String, Object> properties,
             String[] values )
     {
         if ( nodeIdsAreNeo4jIds )

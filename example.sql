@@ -22,14 +22,15 @@ CREATE TABLE Authorship (
         id int primary key,
         author_id int,
         book_id int);
-INSERT INTO "Authorship" VALUES(1,1,1,1);
+INSERT INTO "Authorship" VALUES(1,1,1);
 CREATE TABLE tag ("id" INTEGER PRIMARY KEY NOT NULL, "name" varchar(255) DEFAULT NULL);
 INSERT INTO "tag" VALUES(1,'childrens books');
 INSERT INTO "tag" VALUES(2,'books');
+INSERT INTO "tag" VALUES(3,'youth books');
 CREATE TABLE tagging ("id" INTEGER PRIMARY KEY NOT NULL, "tag_id" integer DEFAULT NULL, "book_id" integer DEFAULT NULL);
 INSERT INTO "tagging" VALUES(1,1,1);
 CREATE TABLE tag_hierarchy ("id" INTEGER PRIMARY KEY NOT NULL, "tag_id" integer DEFAULT NULL, "parent_id" integer DEFAULT NULL);
-INSERT INTO "tag_hierarchy" VALUES(1,2,NULL);
+#INSERT INTO "tag_hierarchy" VALUES(1,2,NULL);
 INSERT INTO "tag_hierarchy" VALUES(2,1,2);
 CREATE TABLE tag_relation ("id" INTEGER PRIMARY KEY NOT NULL, "from_id" integer DEFAULT NULL, "to_id" integer DEFAULT NULL, "desc" varchar(255) DEFAULT NULL);
 INSERT INTO "tag_relation" VALUES(1,1,3,'same genre');

@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.index.lucene.LuceneIndexBatchInserterImpl;
+import org.neo4j.graphdb.index.BatchInserterIndexProvider;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
 
 public class ReadNodesFromFileCommand implements FileImportCommand
@@ -37,7 +38,7 @@ public class ReadNodesFromFileCommand implements FileImportCommand
     }
 
     public void execute( BatchInserterImpl neo4j,
-            LuceneIndexBatchInserterImpl index, int stepSize )
+            BatchInserterIndexProvider index, int stepSize )
     {
         System.out.println("Importing from " + nodeFile);
         this.stepSize = stepSize;
@@ -55,7 +56,7 @@ public class ReadNodesFromFileCommand implements FileImportCommand
     }
 
     protected void processBodyRecords( BatchInserterImpl neo4j,
-            LuceneIndexBatchInserterImpl index ) throws IOException
+            BatchInserterIndexProvider index ) throws IOException
     {
         int lineCount = 0;
         while ( ( strLine = br.readLine() ) != null )
@@ -91,7 +92,7 @@ public class ReadNodesFromFileCommand implements FileImportCommand
     }
 
     protected void processRecord( BatchInserterImpl neo4j,
-            LuceneIndexBatchInserterImpl index, Map<String, Object> properties,
+            BatchInserterIndexProvider index, Map<String, Object> properties,
             String[] values )
     {
         long nodeId = 0;
@@ -108,7 +109,7 @@ public class ReadNodesFromFileCommand implements FileImportCommand
         {
             if ( indexFields.contains( key ) )
             {
-                index.index( nodeId, key, properties.get( key ) );
+                index.nodeIndex( key, MapUtil.stringMap( "type", "exact" )).add( nodeId, MapUtil.map( key, properties.get( key )));
             }
         }
     }
