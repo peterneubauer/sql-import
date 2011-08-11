@@ -32,7 +32,7 @@ public class M2MInstruction extends LinkInstruction {
 	public void execute(BatchInserterImpl neo,
 	        BatchInserterIndexProvider indexService) {
 		long start = System.currentTimeMillis();
-		long aggregationNodeId = SQLImporter.getSubRefNode(fromAggregationName,
+		long aggregationNodeId = SQLImporter.getOrCreateSubRefNode(fromAggregationName,
 				neo);
 
 		int linkCount = 0;

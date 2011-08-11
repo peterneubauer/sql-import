@@ -23,7 +23,7 @@ public class IndexInstruction implements Command {
 	public void execute(BatchInserterImpl neo,
 	        BatchInserterIndexProvider indexProvider) {
 		System.out.println("starting indexing " + createindexName);
-			for (SimpleRelationship rel : neo.getRelationships(SQLImporter.getSubRefNode(
+			for (SimpleRelationship rel : neo.getRelationships(SQLImporter.getOrCreateSubRefNode(
 					toAggregationName, neo))) {
 				if (rel.getType().name().equals(Relationships.IS_A.name())) {
 					Map<String, Object> nodeProperties = neo.getNodeProperties(rel

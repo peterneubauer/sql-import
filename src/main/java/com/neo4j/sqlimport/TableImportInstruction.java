@@ -17,22 +17,24 @@ public class TableImportInstruction extends ImportInstruction
     private final String aggregationNodeName;
     private final Map<Field, String> indexes;
     private final Map<Field, String> foreignKeys;
+    private boolean createSubrefNodes = true;
 
     public TableImportInstruction( String aggregationNodeName,
             String tableName, Field[] names, Map<Field, String> indexes,
-            Map<Field, String> foreignKeys )
+            Map<Field, String> foreignKeys, boolean createSubrefNodes )
     {
         super( names, "INSERT INTO \"" + tableName + "\" VALUES" );
         this.aggregationNodeName = aggregationNodeName;
         this.indexes = indexes;
         this.foreignKeys = foreignKeys;
+        this.createSubrefNodes = createSubrefNodes;
     }
 
     public TableImportInstruction( String aggregationNodeName,
             String tableName, Field[] names, Map<Field, String> indexes )
     {
         this( aggregationNodeName, tableName, names, indexes,
-                new HashMap<Field, String>() );
+                new HashMap<Field, String>(), true );
     }
 
     public String getAggregationNodeName()
@@ -53,9 +55,12 @@ public class TableImportInstruction extends ImportInstruction
         List<Long> nodeIds = new LinkedList<Long>();
         long nodeId = neo.createNode( values );
         nodeIds.add( nodeId );
-        neo.createRelationship( nodeId,
-                SQLImporter.getSubRefNode( getAggregationNodeName(), neo ),
-                Relationships.IS_A, new HashMap<String, Object>() );
+        if ( createSubrefNodes )
+        {
+            neo.createRelationship( nodeId,
+                    SQLImporter.getOrCreateSubRefNode( getAggregationNodeName(), neo ),
+                    Relationships.IS_A, new HashMap<String, Object>() );
+        }
         // index the necessary properties
         Map<Field, String> indexes = getIndexes();
         for ( Field indexField : indexes.keySet() )
@@ -81,9 +86,12 @@ public class TableImportInstruction extends ImportInstruction
                 String indexName = foreignKeys.get( foreignField );
                 BatchInserterIndex index = indexProvider.nodeIndex( indexName,
                         MapUtil.stringMap( "type", "exact" ) );
-                neo.createRelationship( nodeId,
+                neo.createRelationship(
+                        nodeId,
                         index.get( indexName, values.get( foreignField.name ) ).getSingle(),
-                        DynamicRelationshipType.withName( foreignField.name + "_LINKED_TO" ), new HashMap<String, Object>() );
+                        DynamicRelationshipType.withName( foreignField.name
+                                                          + "_LINKED_TO" ),
+                        new HashMap<String, Object>() );
             }
             catch ( NumberFormatException nfe )
             {

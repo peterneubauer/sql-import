@@ -97,7 +97,7 @@ public class SQLImporter
         try
         {
 
-            createSubRefNodes( instructions );
+//            createSubRefNodes( instructions );
             BufferedReader br = new BufferedReader( new FileReader( sqlFile ) );
 
             // replace ,NULL, with ,'',
@@ -291,7 +291,7 @@ public class SQLImporter
 //        }
 //    }
 
-    public static long getSubRefNode( String aggregationNodeName,
+    public static long getOrCreateSubRefNode( String aggregationNodeName,
             BatchInserter neo )
     {
         String subrefName = "subref_" + aggregationNodeName;
@@ -305,6 +305,9 @@ public class SQLImporter
                 aggregationNodeId = rel.getEndNode();
 
             }
+        }
+        if (aggregationNodeId == -1) {
+            aggregationNodeId = createSubrefNode( neo, aggregationNodeName );
         }
         return aggregationNodeId;
     }
@@ -417,7 +420,7 @@ public class SQLImporter
     public static long cerateOrFindSubrefNode( String tableName,
             BatchInserterImpl neo )
     {
-        long subRefNode = getSubRefNode( tableName, neo );
+        long subRefNode = getOrCreateSubRefNode( tableName, neo );
         if ( subRefNode < 0 )
         {
             subRefNode = createSubrefNode( neo, tableName );

@@ -78,7 +78,7 @@ public class InsertTest
         foreignKeys.put( BOOK_ID_FIELD, BOOK_ID );
         indexes.put( ISBN_ID_FIELD, ISBN_ID );
         TableImportInstruction instruction = new TableImportInstruction( ISBNS,
-                "Isbn", fields, indexes, foreignKeys );
+                "Isbn", fields, indexes, foreignKeys, false );
         importer.addImportInstruction( instruction );
     }
 
