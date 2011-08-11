@@ -3,16 +3,16 @@ Neo4j SQL Importer
  
 This is a first attempt to do a reasonable mapping from SQL dump statements in relational databases into a graph in [Neo4j open source graph database](http://neo4j.org/).
 
-![Books import](https://github.com/neo4j/peterneubauer/sql-import/raw/master/src/pics/books.png)
+![Books import](https://github.com/peterneubauer/sql-import/raw/master/src/pics/books.png)
 
 
 Can be imported from SQL like
 
-  BEGIN TRANSACTION;
-  CREATE TABLE Book(
+    BEGIN TRANSACTION;
+    CREATE TABLE Book(
           id int primary key,
           title varchar(250),
-  );
+    );
   INSERT INTO "Book" VALUES(1,,'Pippi 
   Långstrump');
   CREATE TABLE Isbn(
