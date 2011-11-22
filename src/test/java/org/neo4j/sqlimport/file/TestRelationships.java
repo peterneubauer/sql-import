@@ -1,4 +1,4 @@
-package com.neo4j.sqlimport;
+package org.neo4j.sqlimport.file;
 
 import org.neo4j.graphdb.RelationshipType;
 

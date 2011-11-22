@@ -1,4 +1,4 @@
-package com.neo4j.sqlimport;
+package org.neo4j.sqlimport.file;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,13 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.neo4j.sqlimport.Field;
+import com.neo4j.sqlimport.ForeignKeyInstruction;
+import com.neo4j.sqlimport.IntField;
+import com.neo4j.sqlimport.SQLImporter;
+import com.neo4j.sqlimport.StringField;
+import com.neo4j.sqlimport.TableImportInstruction;
 
 public class InsertTest
 {
