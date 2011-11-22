@@ -94,7 +94,7 @@ public class SQLImporter
         try
         {
 
-//            createSubRefNodes( instructions );
+            // createSubRefNodes( instructions );
             BufferedReader br = new BufferedReader( new FileReader( sqlFile ) );
 
             // replace ,NULL, with ,'',
@@ -160,7 +160,6 @@ public class SQLImporter
                                 oldcount = nodecount;
                             }
 
-
                         }
                         catch ( Exception e )
                         {
@@ -187,15 +186,15 @@ public class SQLImporter
         System.out.println( "submitted " + nodecount + "nodes in "
                             + ( System.currentTimeMillis() - start ) / 1000
                             + "s" );
-//        optimizeIndex();
+        // optimizeIndex();
         startLinking();
-//        neo.shutdown();
+        // neo.shutdown();
 
     }
 
     public void startLinking()
     {
-//        startup();
+        // startup();
         for ( IndexInstruction instruction : indexInstructions.values() )
         {
             instruction.execute( neo, indexProvider );
@@ -204,7 +203,7 @@ public class SQLImporter
         {
             instruction.execute( neo, indexProvider );
         }
-//        shutdown();
+        // shutdown();
     }
 
     public void shutdown()
@@ -239,7 +238,10 @@ public class SQLImporter
                         && !line.startsWith( "--" ) )
                 {
                     String nextLine = br.readLine();
-                    line = line.concat( nextLine );
+                    if ( nextLine != null )
+                    {
+                        line = line.concat( nextLine );
+                    }
                 }
                 line.replaceAll( "\n", "" );
                 return line;
@@ -254,39 +256,39 @@ public class SQLImporter
         return null;
     }
 
-//    private void createNode( TableImportInstruction instruction,
-//            HashMap<String, Object> values )
-//    {
-//        nodecount++;
-//        List<Long> nodeIds = new LinkedList<Long>();
-//        long nodeId = neo.createNode( values );
-//        nodeIds.add( nodeId );
-//        neo.createRelationship( nodeId, SQLImporter.getSubRefNode(
-//                instruction.getAggregationNodeName(), neo ),
-//                Relationships.IS_A, new HashMap<String, Object>() );
-//        // index the necessary properties
-//        Map<Field, String> indexes = instruction.getIndexes();
-//        for ( Field indexField : indexes.keySet() )
-//        {
-//            try
-//            {
-//                String indexName = indexes.get( indexField );
-//                indexProvider.nodeIndex( indexName,
-//                        MapUtil.stringMap( "type", "exact" ) ).add( nodeId,
-//                        MapUtil.map( indexName, values.get( indexField.name ) ) );
-//            }
-//            catch ( NumberFormatException nfe )
-//            {
-//                nfe.printStackTrace();
-//            }
-//        }
-//
-//        if ( nodecount - 1000 == oldcount )
-//        {
-//            System.out.println( "." );
-//            oldcount = nodecount;
-//        }
-//    }
+    // private void createNode( TableImportInstruction instruction,
+    // HashMap<String, Object> values )
+    // {
+    // nodecount++;
+    // List<Long> nodeIds = new LinkedList<Long>();
+    // long nodeId = neo.createNode( values );
+    // nodeIds.add( nodeId );
+    // neo.createRelationship( nodeId, SQLImporter.getSubRefNode(
+    // instruction.getAggregationNodeName(), neo ),
+    // Relationships.IS_A, new HashMap<String, Object>() );
+    // // index the necessary properties
+    // Map<Field, String> indexes = instruction.getIndexes();
+    // for ( Field indexField : indexes.keySet() )
+    // {
+    // try
+    // {
+    // String indexName = indexes.get( indexField );
+    // indexProvider.nodeIndex( indexName,
+    // MapUtil.stringMap( "type", "exact" ) ).add( nodeId,
+    // MapUtil.map( indexName, values.get( indexField.name ) ) );
+    // }
+    // catch ( NumberFormatException nfe )
+    // {
+    // nfe.printStackTrace();
+    // }
+    // }
+    //
+    // if ( nodecount - 1000 == oldcount )
+    // {
+    // System.out.println( "." );
+    // oldcount = nodecount;
+    // }
+    // }
 
     public static long getOrCreateSubRefNode( String aggregationNodeName,
             BatchInserter neo )
@@ -303,7 +305,8 @@ public class SQLImporter
 
             }
         }
-        if (aggregationNodeId == -1) {
+        if ( aggregationNodeId == -1 )
+        {
             aggregationNodeId = createSubrefNode( neo, aggregationNodeName );
         }
         return aggregationNodeId;
@@ -319,9 +322,12 @@ public class SQLImporter
     {
         for ( ImportInstruction ins : instructions2 )
         {
-            if(ins instanceof TableImportInstruction ) {
-                
-                createSubrefNode( neo, ((TableImportInstruction)ins).getAggregationNodeName() );
+            if ( ins instanceof TableImportInstruction )
+            {
+
+                createSubrefNode(
+                        neo,
+                        ( (TableImportInstruction) ins ).getAggregationNodeName() );
             }
         }
 
@@ -456,10 +462,10 @@ public class SQLImporter
         this.addIndexInstruction( new IndexInstruction( toAggregationName,
                 toIdField ) );
 
-//        this.addLinkInstruction( new ForeignKeyInstruction(
-//                fromAggregationName, new StringField( fromField ),
-//                createindexName,
-//                DynamicRelationshipType.withName( relationshipName ) ) );
+        // this.addLinkInstruction( new ForeignKeyInstruction(
+        // fromAggregationName, new StringField( fromField ),
+        // createindexName,
+        // DynamicRelationshipType.withName( relationshipName ) ) );
     }
 
     /**
@@ -503,7 +509,7 @@ public class SQLImporter
 
     public void startImporting()
     {
-//        startup();
+        // startup();
 
         for ( AutoImportInstruction instruction : autoImportinstructions )
         {
@@ -511,7 +517,7 @@ public class SQLImporter
 
         }
 
-//        shutdown();
+        // shutdown();
 
     }
 }
