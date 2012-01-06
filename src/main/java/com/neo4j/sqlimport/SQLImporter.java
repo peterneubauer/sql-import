@@ -27,7 +27,6 @@ public class SQLImporter
     private ArrayList<AutoImportInstruction> autoImportinstructions = new ArrayList<AutoImportInstruction>();
     private BatchInserterIndexProvider indexProvider;
     private BatchInserterImpl neo;
-    private int nodecount = 0;
     private int oldcount = 0;
     private ArrayList<LinkInstruction> linkInstructions = new ArrayList<LinkInstruction>();
     private Map<String, IndexInstruction> indexInstructions = new HashMap<String, IndexInstruction>();
