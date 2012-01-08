@@ -84,7 +84,8 @@ public class InsertTest
         Map<Field, String> indexes = new HashMap<Field, String>();
         Map<Field, String> foreignKeys = new HashMap<Field, String>();
         foreignKeys.put( BOOK_ID_FIELD, BOOK_ID );
-        indexes.put( isbnField, ISBN_ID );
+        indexes.put( ISBN_ID_FIELD, ISBN_ID );
+        indexes.put( isbnField, "isbn" );
         TableImportInstruction instruction = new TableImportInstruction( ISBNS,
                 "Isbn", fields, indexes, foreignKeys, false );
         importer.addImportInstruction( instruction );
